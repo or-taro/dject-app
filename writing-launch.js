@@ -12,6 +12,9 @@
 - 플랫폼 전략은 독자 기대, 전개 속도, 상품 구조, 후킹, 회차 구성 같은 추상적 특성만 활용한다.
 - 회차 안에서 사건이나 감정이 실제로 움직이게 하고, 정보 설명만 길게 이어지지 않게 한다.
 - 저장된 시점·분위기·전개 속도·분량·등장인물·세계관·플롯·회차 목표를 지킨다.
+- style_guide가 있으면 숫자·시간·날짜·단위·문장 길이·서술 톤 등 표기 기준을 작품 전체에서 일관되게 지킨다. 비어 있으면 객관적인 시간·수량은 11시 30분, 20분, 3일, 2층처럼 숫자 표기를 우선하되 관용 표현은 자연스럽게 쓴다.
+- speech_guide가 있으면 인물별·상대별 존댓말/반말, 호칭, 말버릇을 그대로 지킨다. 명시적인 관계 변화나 장면상 이유 없이 말투를 임의로 바꾸지 않는다.
+- 저장 직전에 오타, 맞춤법, 띄어쓰기, 조사, 문장부호, 중복 표현, 숫자·시간 표기, 인물 호칭과 말투, 서술 시점이 서로 충돌하지 않는지 한 번 더 교정한다. 이 교정은 의미와 사건을 바꾸지 않는 최소 수정으로 한다.
 - 기존 본문은 사용자가 승인하기 전 자동으로 덮어쓰지 않는다.`;
 
   const KAKAO_STRATEGY=`카카오페이지 전략:
@@ -71,8 +74,8 @@ C) 둘 다 사용할 수 없으면 본문을 작성하지 말고 연결이 필�
 Supabase 경로의 필수 순서:
 1) public.dject_gpt_jobs, public.dject_settings, public.dject_gpt_responses를 일반 SELECT로 조회해 위 ID가 current_job_id와 같고 status='pending'이며 기존 response가 없는지 확인한다.
 2) 조건이 다르면 작성·저장하지 않는다.
-3) job.snapshot.novel.data와 job.snapshot.chapter를 읽는다. target_platform, debut_goal, genre, secondary_genres, logline, work_intro, differentiation, characters, world, summary, long_term_plot, early_episode_plan, mood, pov, pace, length, extra와 회차 goal을 모두 반영한다.
-4) 완성 후 같은 작업 ID에 제목과 본문을 저장한다. Supabase 경로에서는 한 트랜잭션 안에서 조건을 다시 확인한 뒤 public.dject_gpt_responses에 INSERT하고, chapter.version과 base_version이 같으면 job.status='ready', 다르면 'conflict'로 바꾼다.
+3) job.snapshot.novel.data와 job.snapshot.chapter를 읽는다. target_platform, debut_goal, genre, secondary_genres, logline, work_intro, differentiation, characters, speech_guide, world, summary, long_term_plot, early_episode_plan, mood, pov, pace, length, style_guide, extra와 회차 goal을 모두 반영한다.
+4) 초고가 완성되면 저장하기 전에 별도의 교정 패스를 수행한다. 명백한 오타·맞춤법·띄어쓰기를 고치고, style_guide의 숫자/시간/단위 표기와 speech_guide의 상대별 존댓말/반말·호칭이 지켜졌는지 확인한다. 시점과 용어도 회차 안에서 통일한다. 그 뒤 같은 작업 ID에 제목과 본문을 저장한다. Supabase 경로에서는 한 트랜잭션 안에서 조건을 다시 확인한 뒤 public.dject_gpt_responses에 INSERT하고, chapter.version과 base_version이 같으면 job.status='ready', 다르면 'conflict'로 바꾼다.
 5) 저장 후 일반 SELECT로 response 존재와 ready/conflict 상태를 실제 확인한다.
 6) public.dject_chapters의 title/body는 수정하지 않고 results.apply도 호출하지 않는다.
 
