@@ -3,7 +3,7 @@ const DJECT_OWNER_ID = "30660b8d-8223-48a3-acbb-5452835fc7e9";
 const OPS = new Set([
   "novels.list","novels.create","novels.get","novels.save","novels.delete",
   "chapters.create","chapters.get","chapters.save",
-  "jobs.create","jobs.current","jobs.get","results.apply"
+  "jobs.create","jobs.current","jobs.get","results.apply","results.discard"
 ]);
 const cors = {
   "Access-Control-Allow-Origin": "*",

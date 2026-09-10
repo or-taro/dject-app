@@ -1,37 +1,166 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#253c43"><title>디젝트 · 웹소설 작업실</title><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon-192.png"><link rel="stylesheet" href="./style.css"><script src="./app.js?v=13" defer></script><script src="./writing-launch.js?v=13" defer></script><script src="./draft-tools.js?v=13" defer></script></head><body>
-<header><a class="brand" href="./">Dject<span>웹소설 작업실</span></a><div class="header-actions"><button id="openGptManager" type="button">집필 연결</button><span id="mode">GitHub Pages</span></div></header>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#253c43">
+  <title>Dject · 네이버·카카오 웹소설 제작 도구</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon-192.png">
+  <link rel="stylesheet" href="./style.css?v=15">
+  <script src="./app.js?v=15" defer></script>
+  <script src="./writing-launch.js?v=15" defer></script>
+  <script src="./draft-tools.js?v=15" defer></script>
+  <script src="./novel-list-tools.js?v=15" defer></script>
+  <script src="./platform-tools.js?v=15" defer></script>
+</head>
+<body>
+<header>
+  <a class="brand" href="./">Dject<span>네이버·카카오 웹소설 제작 도구</span></a>
+  <div class="header-actions"><button id="openGptManager" type="button">집필 연결</button><span id="mode">GitHub Pages</span></div>
+</header>
 
 <dialog id="gptDialog" class="gpt-dialog"><form method="dialog" class="gpt-manager">
-<div class="row"><div><p class="eyebrow">WRITING LINK</p><h2>집필 연결 관리</h2></div><button type="button" id="closeGptManager" aria-label="닫기">닫기</button></div>
-<p class="muted">주소를 비워두면 일반 ChatGPT를 엽니다. 특정 일반 대화를 계속 쓰고 싶을 때만 /c/... 주소를 저장하세요.</p>
-<div class="manager-grid"><section><label for="gptName">집필 도우미 이름</label><input id="gptName" maxlength="80" placeholder="예: 디"><label for="gptPurpose">용도</label><input id="gptPurpose" maxlength="160" placeholder="예: 본문 집필, 퇴고"><label for="gptUrl">ChatGPT 대화 주소 (선택)</label><input id="gptUrl" type="url" inputmode="url" maxlength="500" placeholder="https://chatgpt.com/c/..."><p id="gptUrlHint" class="muted">비워두면 일반 ChatGPT 새 대화를 엽니다. /share/... 공유 링크는 사용할 수 없습니다.</p><div class="row"><button type="button" id="saveGptProfile" class="primary">연결 저장</button><button type="button" id="newGptProfile">새 연결</button><button type="button" id="deleteGptProfile" class="danger">선택 삭제</button></div><div id="gptProfileList" class="profile-list"></div></section>
-<section class="connect-guide" hidden><details><summary>처음 연결할 때만 보는 고급 설정</summary><h3>집필 도우미에 Dject 연결</h3><ol><li>GPT 편집 화면에서 <b>구성 → 작업 → 새 작업 만들기</b>로 이동</li><li>인증을 <b>API Key / Bearer</b>로 설정하고 Dject Action 키를 입력</li><li>아래 OpenAPI 스키마를 붙여넣기</li><li>아래 GPT 지침을 GPT의 Instructions에 추가</li></ol><div class="stack"><button type="button" id="copyActionSchema">Action 스키마 복사</button><button type="button" id="copyGptInstructions">GPT 지침 복사</button><a class="button-link" href="https://chatgpt.com/gpts" target="_blank" rel="noopener noreferrer">연결할 GPT 찾기 ↗</a></div><p class="security-note">Action용 Bearer 키는 이 웹앱 코드에 저장하지 않습니다. 연결할 GPT의 인증 설정에만 넣으세요.</p><textarea id="actionSchemaText" readonly hidden></textarea><textarea id="gptInstructionsText" readonly hidden></textarea></details></section></div>
+  <div class="row"><div><p class="eyebrow">WRITING LINK</p><h2>집필 연결 관리</h2></div><button type="button" id="closeGptManager" aria-label="닫기">닫기</button></div>
+  <p class="muted">주소를 비워두면 일반 ChatGPT를 엽니다. 특정 일반 대화를 계속 쓰고 싶을 때만 /c/... 주소를 저장하세요.</p>
+  <div class="manager-grid"><section>
+    <label for="gptName">집필 도우미 이름</label><input id="gptName" maxlength="80" placeholder="예: 디">
+    <label for="gptPurpose">용도</label><input id="gptPurpose" maxlength="160" placeholder="예: 본문 집필, 작품 점검">
+    <label for="gptUrl">ChatGPT 대화 주소 (선택)</label><input id="gptUrl" type="url" inputmode="url" maxlength="500" placeholder="https://chatgpt.com/c/...">
+    <p id="gptUrlHint" class="muted">비워두면 일반 ChatGPT 새 대화를 엽니다. /share/... 공유 링크는 사용할 수 없습니다.</p>
+    <div class="row"><button type="button" id="saveGptProfile" class="primary">연결 저장</button><button type="button" id="newGptProfile">새 연결</button><button type="button" id="deleteGptProfile" class="danger">선택 삭제</button></div>
+    <div id="gptProfileList" class="profile-list"></div>
+  </section>
+  <section class="connect-guide" hidden><details><summary>고급 연결 설정</summary><div class="stack"><button type="button" id="copyActionSchema">Action 스키마 복사</button><button type="button" id="copyGptInstructions">GPT 지침 복사</button></div><textarea id="actionSchemaText" readonly hidden></textarea><textarea id="gptInstructionsText" readonly hidden></textarea></details></section></div>
 </form></dialog>
-<dialog id="askDialog"><form id="askForm"><p id="askMessage"></p><input id="askInput" maxlength="200" aria-label="작품 제목"><div class="row"><button type="button" id="askCancel">취소</button><button type="submit" class="primary">확인</button></div></form></dialog>
 
-<main><section class="intro"><div><p class="eyebrow">STORY FIRST</p><h1>아이디어에서 한 화까지, 순서대로.</h1><p>먼저 작품을 고르고 아이디어·장르·분위기를 정한 다음 이번 화를 설계하고 집필하세요.</p></div><button id="createNovel" class="primary big">＋ 새 작품 시작</button></section>
-<div id="workspace"><aside><div class="side-head"><strong>내 작품</strong></div><div id="novelList"></div></aside>
-<section id="editor" hidden>
-<nav class="flow-nav" aria-label="작업 순서"><span>지금 할 일</span><button type="button" data-jump="planSection" class="active">1 작품 기획</button><button type="button" data-jump="chapterSection">2 이번 화</button><button type="button" data-jump="gptSection">3 집필</button><button type="button" data-jump="writingSection">4 본문</button></nav>
-<div class="editor-top"><div><span class="step-kicker">현재 작품</span><input id="title" maxlength="200" class="title" placeholder="작품 제목"></div><div class="editor-actions"><span id="saveState" role="status">저장됨</span><button id="refresh">새로 불러오기</button><button id="deleteNovel" class="danger">삭제</button></div></div>
+<dialog id="askDialog"><form id="askForm"><p id="askMessage"></p><input id="askInput" maxlength="200" aria-label="입력"><div class="row"><button type="button" id="askCancel">취소</button><button type="submit" class="primary">확인</button></div></form></dialog>
 
-<section class="flow-card plan-card" id="planSection"><div class="now-badge">지금 여기부터 입력하세요</div><div class="flow-head"><span class="step-badge">1</span><div><h2>작품 기획</h2><p>아이디어와 작품의 기본 결을 먼저 정합니다.</p></div></div>
-<label for="idea" class="main-label">아이디어</label><textarea id="idea" maxlength="10000" rows="5" class="idea-box" placeholder="예: 죽은 사람의 기억을 볼 수 있게 된 회사원이 실종 사건을 추적한다."></textarea>
-<div class="choice-grid"><label>장르<select id="genre"><option>로맨스판타지</option><option>현대로맨스</option><option>판타지</option><option>무협</option><option>현대판타지</option><option>BL</option><option>스릴러</option><option>미스터리</option><option>학원물</option><option>기타</option></select></label><label>분위기<select id="mood"><option>설렘</option><option>진지함</option><option>긴장감</option><option>감성적</option><option>코믹</option><option>다크</option></select></label><label>시점<select id="pov"><option>1인칭</option><option>3인칭</option></select></label><label>전개 속도<select id="pace"><option>보통</option><option>빠름</option><option>느림</option></select></label><label class="wide">한 화 분량<select id="length"><option>보통 1화 · 공백 포함 5,000~6,000자</option><option>장면 · 공백 포함 900~1,400자</option><option>짧은 1화 · 공백 포함 2,500~3,500자</option><option>긴 1화 · 공백 포함 7,000~9,000자</option></select></label></div>
-<details class="advanced"><summary>인물·세계관·줄거리 등 상세 설정</summary><label for="characters">캐릭터 설정</label><textarea id="characters" rows="4" maxlength="20000" placeholder="주인공, 주요 인물, 관계를 적어두세요."></textarea><label for="world">세계관·배경</label><textarea id="world" rows="4" maxlength="20000" placeholder="시대, 장소, 규칙, 능력 등을 적어두세요."></textarea><label for="summary">기존 줄거리</label><textarea id="summary" rows="4" maxlength="30000" placeholder="지금까지의 핵심 줄거리를 적어두세요."></textarea><label for="extra">추가 요청</label><textarea id="extra" rows="3" maxlength="10000" placeholder="피하고 싶은 전개, 꼭 넣고 싶은 요소 등"></textarea></details><div class="next-step"><span>기획이 끝났다면</span><button type="button" class="primary" data-jump="chapterSection">다음: 이번 화 설계 →</button></div>
-</section>
+<dialog id="newNovelDialog" class="wizard-dialog">
+  <form method="dialog" id="newNovelForm">
+    <div class="wizard-top"><div><p class="eyebrow">NEW STORY</p><h2>새 작품 만들기</h2></div><button type="button" id="closeNewNovel">닫기</button></div>
+    <div class="wizard-progress" aria-label="새 작품 단계"><span class="active">1 아이디어</span><span>2 플랫폼</span><span>3 목표</span><span>4 장르</span><span>5 시작</span></div>
 
-<section class="flow-card chapter" id="chapterSection"><div class="flow-head"><span class="step-badge">2</span><div><h2>이번 화 설계</h2><p>이번 회차에서 무엇을 보여줄지만 정하면 됩니다.</p></div></div><div class="chapter-toolbar"><label for="chapterSelect">현재 회차<select id="chapterSelect"></select></label><button id="nextChapter">다음 화 준비</button></div><label for="chapterTitle">회차 제목</label><input id="chapterTitle" maxlength="200" placeholder="예: 프롤로그"><label for="goal">이번 회차 목표</label><textarea id="goal" rows="4" maxlength="10000" placeholder="이번 화에서 반드시 일어날 사건, 감정 변화, 끝맺음을 적어보세요."></textarea><div class="next-step"><span>이번 화 목표까지 정했다면</span><button type="button" class="primary" data-jump="gptSection">다음: 집필 →</button></div></section>
+    <section class="wizard-step" data-wizard-step="1">
+      <h3>어떤 이야기를 만들고 싶나요?</h3>
+      <p>짧은 아이디어만 적어도 됩니다. Dject가 작품 형태로 발전시켜드립니다.</p>
+      <textarea id="wizardIdea" rows="8" maxlength="10000" placeholder="평범한 회사원이 이상한 회사에 취직했는데 야근할 때마다 괴담이 나타난다."></textarea>
+      <button id="wizardIdeaSuggest" type="button" class="soft-action">아이디어 추천받기</button>
+    </section>
 
-<section class="flow-card gpt" id="gptSection"><div class="flow-head"><span class="step-badge">3</span><div><h2>집필 시작</h2><p>저장된 설정과 이번 화 목표를 바탕으로 디가 본문을 작성합니다.</p></div><span id="jobState">준비 전</span></div><div class="gpt-target"><label for="activeGpt">집필 도우미<select id="activeGpt"></select></label><button type="button" id="manageGptInline">연결 설정</button></div><div class="action-guide"><b>집필을 시작하고, 돌아온 뒤 새 글을 따로 확인할 수 있습니다.</b></div><div class="action-row"><button id="publishJob" class="primary big">집필 시작</button><button id="showLatestResult" type="button">새 글 확인</button><button id="rewriteJob" type="button">다시 집필</button><button id="checkJob" hidden>상태 새로고침</button><button id="copyRequest" hidden>집필 문구 복사</button></div><textarea id="requestText" readonly hidden aria-label="집필 시작 문구"></textarea></section>
+    <section class="wizard-step" data-wizard-step="2" hidden>
+      <h3>어디에서 연재하거나 데뷔하고 싶나요?</h3>
+      <div class="choice-cards platform-cards">
+        <label><input type="radio" name="wizardPlatform" value="kakao"><strong>카카오페이지</strong><span>CP 투고와 정식 데뷔를 고려한 작품 설계</span></label>
+        <label><input type="radio" name="wizardPlatform" value="naver"><strong>네이버</strong><span>자유연재, 독자 반응, 정식 연재 진입을 고려한 설계</span></label>
+        <label><input type="radio" name="wizardPlatform" value="undecided" checked><strong>아직 모르겠어요</strong><span>네이버와 카카오 중 더 적합한 방향을 비교</span></label>
+      </div>
+    </section>
 
-<section id="latestResult" class="flow-card" hidden><div class="flow-head"><div><h3>새로 작성된 글</h3><p>기존 본문과 별도로 확인한 뒤 원하는 경우 본문으로 사용할 수 있습니다.</p></div><span id="latestResultState"></span></div><textarea id="latestResultBody" readonly rows="14" aria-label="새로 작성된 글"></textarea><div class="row"><button id="applyLatestResult" class="primary" type="button">본문으로 사용</button><button id="hideLatestResult" type="button">닫기</button></div></section>
+    <section class="wizard-step" data-wizard-step="3" hidden>
+      <h3>어떤 방식으로 도전하고 싶나요?</h3>
+      <p id="wizardGoalHint">선택은 나중에 바꿀 수 있습니다.</p>
+      <div class="choice-cards compact-cards">
+        <label><input type="radio" name="wizardGoal" value="debut"><strong>정식 데뷔</strong></label>
+        <label><input type="radio" name="wizardGoal" value="serial"><strong>자유연재</strong></label>
+        <label><input type="radio" name="wizardGoal" value="contest"><strong>공모전</strong></label>
+        <label><input type="radio" name="wizardGoal" value="undecided" checked><strong>아직 결정하지 않음</strong></label>
+      </div>
+    </section>
 
-<section id="review" hidden><h3>집필 결과 검토</h3><p>편집 중인 본문이 바뀌어 자동 적용하지 않았습니다. 아래 결과를 확인하세요.</p><textarea id="responseBody" readonly rows="10" aria-label="집필 결과 본문"></textarea><button id="applyResult">현재 회차에 적용</button></section>
+    <section class="wizard-step" data-wizard-step="4" hidden>
+      <h3>작품의 장르를 정해주세요.</h3>
+      <label for="wizardGenre">주 장르</label>
+      <select id="wizardGenre"><option>현대판타지</option><option>판타지</option><option>무협</option><option>로맨스</option><option>현대로맨스</option><option>로맨스판타지</option><option>대체역사</option><option>스포츠</option><option>미스터리/괴담</option><option>아카데미</option><option>스릴러</option><option>BL</option><option>학원물</option><option>기타</option></select>
+      <p class="field-help">보조 장르는 선택하지 않아도 됩니다.</p>
+      <div id="wizardSecondaryGenres" class="chip-grid"></div>
+    </section>
 
-<section class="flow-card writing" id="writingSection"><div class="flow-head"><span class="step-badge">4</span><div><h2>본문</h2><p>직접 쓰거나 완성된 결과를 이어서 편집하세요.</p></div><span id="count">0자 · 공백 포함</span></div><div class="writing-tools"><button id="copyBody">복사</button><button id="download">파일로 보관</button><button id="clearBody" class="danger" type="button">기존 본문 비우기</button></div><textarea id="body" maxlength="100000" rows="22" placeholder="여기에 본문이 표시됩니다."></textarea><button id="save" class="primary">지금 저장</button></section>
-</section>
-<section id="empty"><div class="empty-card"><span class="step-badge">1</span><h2>새 작품으로 시작하세요.</h2><p>작품을 만들면 아이디어와 장르 선택 화면부터 바로 시작합니다.</p><button id="emptyCreate" class="primary big" type="button">＋ 새 작품 시작</button></div></section></div>
-<p id="message" role="status" aria-live="polite"></p><section id="recovery" hidden><h3>저장되지 않은 입력이 있습니다.</h3><p>다른 기기의 변경과 충돌했을 수 있습니다. 입력 내용을 파일로 보관한 뒤 새로 불러오세요.</p><button id="exportDraft">입력 내용 보관</button></section></main>
-<footer>Dject · GitHub Pages + Supabase</footer>
-<script>window.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('emptyCreate');const c=document.getElementById('createNovel');if(b&&c)b.addEventListener('click',()=>c.click());document.querySelectorAll('[data-jump]').forEach(x=>x.addEventListener('click',()=>{const t=document.getElementById(x.dataset.jump);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}));});</script></body></html>
+    <section class="wizard-step" data-wizard-step="5" hidden>
+      <h3>작품을 시작할 준비가 됐습니다.</h3>
+      <label for="wizardTitle">작품 제목 <span class="optional">(임시 제목도 가능)</span></label>
+      <input id="wizardTitle" maxlength="200" placeholder="제목 미정">
+      <div id="wizardSummary" class="wizard-summary"></div>
+      <p class="muted">생성 후 플랫폼, 장르, 설정은 언제든 변경할 수 있습니다.</p>
+    </section>
+
+    <div class="wizard-actions"><button id="wizardBack" type="button" hidden>이전</button><button id="wizardNext" type="button" class="primary">다음</button><button id="wizardCreate" type="button" class="primary big" hidden>작품 만들기</button></div>
+  </form>
+</dialog>
+
+<main>
+  <section class="home-hero" id="homeHero">
+    <p class="eyebrow">NAVER · KAKAO</p>
+    <h1>웹소설을 만들어보세요.</h1>
+    <p>아이디어부터 회차 집필, 플랫폼 점검, 데뷔 준비까지 한 작품 안에서 이어갑니다.</p>
+    <div class="hero-actions"><button id="createNovel" class="primary big">＋ 새 작품 만들기</button><button id="continueExisting" type="button">기존 작품 계속하기</button></div>
+  </section>
+
+  <div id="workspace" hidden>
+    <section id="homeSection" class="home-projects">
+      <div class="section-title"><div><p class="eyebrow">MY STORIES</p><h2>내 작품</h2></div><span id="novelCount"></span></div>
+      <div id="novelList" class="novel-card-grid"></div>
+      <section id="empty"><div class="empty-card"><span class="step-badge">1</span><h2>첫 작품을 만들어보세요.</h2><p>아이디어 한 줄에서 시작할 수 있습니다.</p><button id="emptyCreate" class="primary big" type="button">＋ 새 작품 만들기</button></div></section>
+    </section>
+
+    <section id="editor" hidden>
+      <section class="project-dashboard" id="dashboardSection">
+        <div class="dashboard-heading"><div><p class="eyebrow">PROJECT DASHBOARD</p><h1 id="dashboardTitle">작품</h1><p id="dashboardMeta"></p></div><button id="backToProjects" type="button">← 내 작품</button></div>
+        <div class="status-strip"><span id="dashboardPlatform">플랫폼 미정</span><span id="dashboardGenre">장르 미정</span><span id="dashboardChapter">현재 1화</span><span id="dashboardStatus">기획 중</span></div>
+        <nav class="dashboard-nav" aria-label="작품 작업 메뉴">
+          <button type="button" data-jump="planSection">작품 기획</button><button type="button" data-jump="characterSection">등장인물</button><button type="button" data-jump="worldSection">세계관</button><button type="button" data-jump="plotSection">전체 플롯</button><button type="button" data-jump="chapterSection">회차 구성</button><button type="button" data-jump="gptSection" class="primary">집필</button><button type="button" data-jump="platformSection">플랫폼 적합성</button><button type="button" data-jump="debutSection">데뷔 준비</button>
+        </nav>
+      </section>
+
+      <div class="editor-top"><div><span class="step-kicker">작품 제목</span><input id="title" maxlength="200" class="title" placeholder="작품 제목"></div><div class="editor-actions"><span id="saveState" role="status">저장됨</span><button id="refresh">새로 불러오기</button><button id="deleteNovel" class="danger">작품 삭제</button></div></div>
+
+      <section class="flow-card plan-card" id="planSection">
+        <div class="flow-head"><span class="step-badge">1</span><div><h2>작품 기획</h2><p>아이디어와 목표 플랫폼, 작품의 핵심 콘셉트를 정합니다.</p></div></div>
+        <label for="idea" class="main-label">아이디어</label><textarea id="idea" maxlength="10000" rows="5" class="idea-box" placeholder="이야기의 핵심 아이디어를 적어주세요."></textarea>
+        <div class="choice-grid">
+          <label>목표 플랫폼<select id="target_platform"><option value="undecided">아직 모르겠어요</option><option value="kakao">카카오페이지</option><option value="naver">네이버</option></select></label>
+          <label>도전 방식<select id="debut_goal"><option value="undecided">아직 결정하지 않음</option><option value="debut">정식 데뷔</option><option value="serial">자유연재</option><option value="contest">공모전</option></select></label>
+          <label>주 장르<select id="genre"><option>현대판타지</option><option>판타지</option><option>무협</option><option>로맨스</option><option>현대로맨스</option><option>로맨스판타지</option><option>대체역사</option><option>스포츠</option><option>미스터리/괴담</option><option>아카데미</option><option>스릴러</option><option>BL</option><option>학원물</option><option>기타</option></select></label>
+          <label>작품 상태<select id="project_status"><option value="planning">기획 중</option><option value="writing">집필 중</option><option value="preparing">연재·투고 준비</option></select></label>
+        </div>
+        <label>보조 장르</label><input id="secondary_genres" type="hidden"><div id="secondaryGenreChoices" class="chip-grid"></div>
+        <div class="concept-grid"><label>한 줄 로그라인<textarea id="logline" rows="2" maxlength="1000" placeholder="한 문장으로 작품의 매력을 설명해보세요."></textarea></label><label>작품 소개<textarea id="work_intro" rows="4" maxlength="5000" placeholder="독자나 편집자가 빠르게 이해할 수 있는 소개문"></textarea></label><label>핵심 차별점<textarea id="differentiation" rows="3" maxlength="5000" placeholder="이 작품만의 매력과 차별점"></textarea></label></div>
+        <div class="action-row"><button id="generateConcept" type="button" class="primary">AI로 콘셉트 정리</button><button id="applyConceptSuggestion" type="button" hidden>제안 반영</button></div>
+        <section id="conceptSuggestion" class="ai-suggestion" hidden><div class="suggestion-label">AI 제안 · 원문과 별도 저장</div><div id="conceptSuggestionBody"></div></section>
+        <details class="advanced"><summary>문체·전개 등 집필 기본 설정</summary><div class="choice-grid"><label>분위기<select id="mood"><option>설렘</option><option>진지함</option><option>긴장감</option><option>감성적</option><option>코믹</option><option>다크</option></select></label><label>시점<select id="pov"><option>1인칭</option><option>3인칭</option></select></label><label>전개 속도<select id="pace"><option>보통</option><option>빠름</option><option>느림</option></select></label><label>한 화 분량<select id="length"><option>보통 1화 · 공백 포함 5,000~6,000자</option><option>장면 · 공백 포함 900~1,400자</option><option>짧은 1화 · 공백 포함 2,500~3,500자</option><option>긴 1화 · 공백 포함 7,000~9,000자</option></select></label></div><label for="extra">추가 요청</label><textarea id="extra" rows="3" maxlength="10000" placeholder="피하고 싶은 전개, 꼭 넣고 싶은 요소 등"></textarea></details>
+      </section>
+
+      <section class="flow-card" id="characterSection"><div class="flow-head"><span class="step-badge">2</span><div><h2>등장인물</h2><p>주인공의 목표와 주요 인물의 관계를 정리합니다.</p></div></div><label for="characters">캐릭터 설정</label><textarea id="characters" rows="8" maxlength="20000" placeholder="주인공, 주요 인물, 관계, 욕망과 갈등을 적어두세요."></textarea></section>
+
+      <section class="flow-card" id="worldSection"><div class="flow-head"><span class="step-badge">3</span><div><h2>세계관</h2><p>시대, 장소, 능력과 규칙 등 작품이 움직이는 기준을 정합니다.</p></div></div><label for="world">세계관·배경</label><textarea id="world" rows="8" maxlength="20000" placeholder="시대, 장소, 규칙, 능력, 금기 등을 적어두세요."></textarea></section>
+
+      <section class="flow-card" id="plotSection"><div class="flow-head"><span class="step-badge">4</span><div><h2>전체 플롯</h2><p>현재 줄거리와 장기 연재 방향, 초반 회차 계획을 나눠 관리합니다.</p></div></div><label for="summary">전체 시놉시스·현재 줄거리</label><textarea id="summary" rows="8" maxlength="30000" placeholder="작품의 시작부터 주요 전환점과 결말 방향을 정리하세요."></textarea><label for="long_term_plot">장기 연재 방향</label><textarea id="long_term_plot" rows="6" maxlength="20000" placeholder="중장기 갈등, 성장, 관계 변화, 확장 방향"></textarea><label for="early_episode_plan">초반 10~20화 구성</label><textarea id="early_episode_plan" rows="8" maxlength="20000" placeholder="초반 회차별 핵심 사건과 후킹을 정리하세요."></textarea></section>
+
+      <section class="flow-card chapter" id="chapterSection"><div class="flow-head"><span class="step-badge">5</span><div><h2>회차 구성</h2><p>이번 화에서 실제로 일어날 사건과 끝맺음을 정합니다.</p></div></div><div class="chapter-toolbar"><label for="chapterSelect">현재 회차<select id="chapterSelect"></select></label><button id="nextChapter">다음 화 설계</button></div><label for="chapterTitle">회차 제목</label><input id="chapterTitle" maxlength="200" placeholder="예: 프롤로그"><label for="goal">이번 회차 목표</label><textarea id="goal" rows="5" maxlength="10000" placeholder="이번 화에서 반드시 일어날 사건, 감정 변화, 보상, 끝맺음을 적어보세요."></textarea><div class="next-step"><span>회차 설계가 끝났다면</span><button type="button" class="primary" data-jump="gptSection">본문 집필로 이동 →</button></div></section>
+
+      <section class="flow-card gpt" id="gptSection"><div class="flow-head"><span class="step-badge">6</span><div><h2>집필</h2><p>공통 웹소설 원칙에 목표 플랫폼 전략을 더해 이번 화를 작성합니다.</p></div><span id="jobState">준비 전</span></div><div class="gpt-target"><label for="activeGpt">집필 도우미<select id="activeGpt"></select></label><button type="button" id="manageGptInline">연결 설정</button></div><div id="writingStrategySummary" class="strategy-summary"></div><div class="action-row"><button id="publishJob" class="primary big">본문 작성</button><button id="showLatestResult" type="button">새 글 확인</button><button id="rewriteJob" type="button">다시 집필</button><button id="manualWriting" type="button">직접 쓰기</button><button id="checkJob" hidden>상태 새로고침</button><button id="copyRequest" hidden>집필 문구 복사</button></div><textarea id="requestText" readonly hidden aria-label="집필 시작 문구"></textarea></section>
+
+      <section id="latestResult" class="flow-card" hidden><div class="flow-head"><div><h3>새로 작성된 글</h3><p>기존 본문과 별도로 확인한 뒤 원하는 경우에만 본문으로 사용합니다.</p></div><span id="latestResultState"></span></div><textarea id="latestResultBody" readonly rows="14" aria-label="새로 작성된 글"></textarea><div class="row"><button id="applyLatestResult" class="primary" type="button">본문으로 사용</button><button id="hideLatestResult" type="button">닫기</button></div></section>
+
+      <section id="review" hidden><h3>집필 결과 검토</h3><p>편집 중인 본문이 바뀌어 자동 적용하지 않았습니다.</p><textarea id="responseBody" readonly rows="10" aria-label="집필 결과 본문"></textarea><button id="applyResult">현재 회차에 적용</button></section>
+
+      <section class="flow-card writing" id="writingSection"><div class="flow-head"><span class="step-badge">7</span><div><h2>본문</h2><p>직접 쓰거나 승인한 새 글을 이어서 편집하세요.</p></div><span id="count">0자 · 공백 포함</span></div><div class="writing-tools"><button id="copyBody">복사</button><button id="download">파일로 보관</button><button id="clearBody" class="danger" type="button">기존 본문 비우기</button></div><textarea id="body" maxlength="100000" rows="22" placeholder="여기에 본문이 표시됩니다."></textarea><button id="save" class="primary">지금 저장</button><div class="chapter-review-actions"><button id="runEpisodeReview" type="button">이번 화 점검</button><button id="runHookReview" type="button">후킹 점검</button><button id="runPlatformEpisodeReview" type="button" class="primary-outline">플랫폼 기준 점검</button></div><section id="chapterReviewPanel" class="ai-suggestion" hidden><div class="suggestion-label">회차 점검 결과 · 원문은 자동 수정하지 않음</div><div id="chapterReviewBody"></div></section></section>
+
+      <section class="flow-card platform-review" id="platformSection"><div class="flow-head"><span class="step-badge">8</span><div><h2>플랫폼 적합성</h2><p id="platformReviewIntro">작품 설정과 원고를 목표 플랫폼 기준으로 점검합니다.</p></div></div><div class="action-row"><button id="runPlatformAnalysis" type="button" class="primary big">플랫폼 적합성 점검</button><button id="refreshAiResults" type="button">분석 결과 새로고침</button></div><div id="platformAnalysisContent" class="report-area empty-report">아직 실행한 분석이 없습니다.</div><div class="action-row"><button id="runRevisionSuggestion" type="button">추천 수정안 만들기</button><button id="applyRevisionSuggestion" type="button" hidden>수정안 반영</button></div><section id="revisionSuggestion" class="ai-suggestion" hidden><div class="suggestion-label">AI 수정 제안 · 승인 전 원문 유지</div><div id="revisionSuggestionBody"></div></section><p class="score-note">플랫폼 적합도 점수는 실제 성공 확률이 아니라 작품 구조를 기준으로 한 상대적인 비교값입니다.</p></section>
+
+      <section class="flow-card debut" id="debutSection"><div class="flow-head"><span class="step-badge">9</span><div><h2 id="debutTitle">데뷔 준비</h2><p id="debutIntro">목표 플랫폼에 필요한 자료를 작품 설정에서 정리합니다.</p></div></div><div class="action-row"><button id="buildDebutPackage" type="button" class="primary big">데뷔 준비 자료 만들기</button><button id="prelaunchCheck" type="button">연재 시작 전 점검</button><button id="copyDebutPackage" type="button">전체 복사</button><button id="downloadDebutPackage" type="button">자료 파일로 저장</button><button id="downloadSubmissionManuscript" type="button">원고 모음 파일</button></div><div id="debutPackageContent" class="report-area empty-report">아직 만든 자료가 없습니다.</div><div id="prelaunchCheckContent" class="report-area empty-report" hidden></div></section>
+    </section>
+  </div>
+
+  <p id="message" role="status" aria-live="polite"></p>
+  <section id="recovery" hidden><h3>저장되지 않은 입력이 있습니다.</h3><p>다른 기기의 변경과 충돌했을 수 있습니다. 입력 내용을 파일로 보관한 뒤 새로 불러오세요.</p><button id="exportDraft">입력 내용 보관</button></section>
+</main>
+<footer>Dject · 네이버·카카오 웹소설 작가 데뷔 제작 도구</footer>
+<script>
+window.addEventListener('DOMContentLoaded',()=>{
+  const b=document.getElementById('emptyCreate');const c=document.getElementById('createNovel');if(b&&c)b.addEventListener('click',()=>c.click());
+  document.querySelectorAll('[data-jump]').forEach(x=>x.addEventListener('click',()=>{const t=document.getElementById(x.dataset.jump);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}));
+});
+</script>
+</body>
+</html>
