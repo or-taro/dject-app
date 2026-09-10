@@ -1,4 +1,4 @@
-const CACHE='dject-pages-v11';
+const CACHE='dject-pages-v12';
 const ASSETS=['./','./index.html','./style.css','./app.js?v=11','./writing-launch.js?v=11','./draft-tools.js?v=11','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
