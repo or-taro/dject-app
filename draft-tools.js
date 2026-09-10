@@ -17,7 +17,7 @@
   showJob=function(result){
     job=result?.job||null;
     currentHasResponse=!!result?.response;
-    const labels={pending:'집필 중 · 자동 확인 중',ready:'새 글 도착',completed:'본문 반영 완료',conflict:'새 글 확인 필요',superseded:'새 작업으로 교체됨'};
+    const labels={pending:'집필 중 · 자동 확인 중',ready:'새 글 도착',completed:'본문 반영 완료',conflict:'새 글 확인 필요',superseded:'새 글 없음'};
     const effective=currentHasResponse&&job?.status==='pending'?'ready':job?.status;
     el('jobState').textContent=job?`${labels[effective]||effective}${job.chapter_id!==chapter?.id?' · 다른 회차':''}`:'준비 전';
     if(el('review'))el('review').hidden=true;
@@ -59,6 +59,22 @@
   const countText=body=>`${Array.from(body||'').length.toLocaleString()}자`;
   const hideLatest=()=>{const panel=el('latestResult');if(panel)panel.hidden=true;};
 
+  function ensureDiscardButton(){
+    let button=el('discardLatestResult');
+    if(button)return button;
+    const use=el('applyLatestResult');
+    if(!use?.parentElement)return null;
+    button=document.createElement('button');
+    button.id='discardLatestResult';
+    button.type='button';
+    button.className='danger';
+    button.textContent='새 글 버리기';
+    use.after(button);
+    return button;
+  }
+
+  const discardButton=ensureDiscardButton();
+
   async function refreshLatestResult(showWaiting=true){
     if(refreshing||!novel||!chapter)return;
     refreshing=true;
@@ -75,6 +91,7 @@
       const state=el('latestResultState');
       const body=el('latestResultBody');
       const use=el('applyLatestResult');
+      const discard=el('discardLatestResult')||ensureDiscardButton();
       if(result.response?.body){
         latestResult=result;
         panel.hidden=false;
@@ -85,12 +102,14 @@
         use.hidden=false;
         use.disabled=chapter.body===result.response.body;
         use.textContent=use.disabled?'현재 본문에 반영됨':'본문으로 사용';
+        if(discard)discard.hidden=!!use.disabled||result.job.status==='completed';
         if(showWaiting)say('새로 집필된 글을 불러왔습니다. 본문을 바꾸지 않고 먼저 확인할 수 있습니다.');
       }else{
         panel.hidden=false;
         body.hidden=true;
         body.value='';
         use.hidden=true;
+        if(discard)discard.hidden=true;
         state.textContent=result.job.status==='pending'?'집필 중 · 아직 새 글이 도착하지 않았습니다.':'저장된 새 글이 없습니다.';
         if(showWaiting)say(state.textContent);
       }
@@ -118,6 +137,19 @@
     showJob(applied);
     say('확인한 새 글을 현재 본문에 반영했습니다.');
     await refreshLatestResult(false);
+  }));
+
+  discardButton?.addEventListener('click',()=>run(async()=>{
+    await flush();
+    const result=latestResult||await api('jobs.current');
+    if(!result?.job||result.job.chapter_id!==chapter.id||!result.response?.body)return say('버릴 새 글이 없습니다.');
+    if(result.job.status==='completed'||chapter.body===result.response.body)return say('이미 본문에 반영된 글은 여기서 버릴 수 없습니다.');
+    if(!(await ask('이 새 글을 삭제할까요? 현재 본문은 그대로 유지됩니다.')))return;
+    const discarded=await api('results.discard',{id:result.job.id});
+    latestResult=null;
+    showJob(discarded);
+    hideLatest();
+    say('새 글을 삭제했습니다. 현재 본문은 변경하지 않았습니다. 다시 집필할 수 있습니다.');
   }));
 
   el('clearBody')?.addEventListener('click',()=>run(async()=>{
