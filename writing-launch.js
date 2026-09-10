@@ -44,17 +44,13 @@
     startButton.onclick=()=>run(async()=>{
       const url=safeUrl(readUrls()[activeId()]);
       if(!url){say('처음 한 번만 집필 연결에서 사용할 대화 주소를 등록해 주세요.');openGptManager();queueMicrotask(fillUrl);return;}
-      const launch=window.open('about:blank','_blank');
-      if(launch)launch.opener=null;
       try{await navigator.clipboard.writeText(START_TEXT);}catch{}
-      try{
-        await flush();
-        let published=job;
-        if(!published||published.chapter_id!==chapter.id||published.status!=='pending')published=await api('jobs.create',{id:chapter.id});
-        showJob({job:published});
-        if(launch)launch.location.href=url;
-        say(launch?'집필 창을 열었습니다. 열린 창에서 붙여넣기 후 보내기만 하면 됩니다.':'집필 준비가 끝났습니다. 브라우저에서 새 창을 허용해 주세요.');
-      }catch(error){try{launch?.close();}catch{}throw error;}
+      await flush();
+      let published=job;
+      if(!published||published.chapter_id!==chapter.id||published.status!=='pending')published=await api('jobs.create',{id:chapter.id});
+      showJob({job:published});
+      say('집필 준비가 끝났습니다. 집필 창으로 이동합니다.');
+      window.location.assign(url);
     });
   }
 
