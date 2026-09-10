@@ -182,3 +182,10 @@
   window.addEventListener('focus',()=>setTimeout(()=>refreshLatestResult(false),250));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(()=>refreshLatestResult(false),250);});
 })();
+
+(() => {
+  const script=document.createElement('script');
+  script.src='./novel-list-tools.js?v=14';
+  script.async=false;
+  document.head.append(script);
+})();
