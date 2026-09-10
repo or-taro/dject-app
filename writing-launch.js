@@ -26,7 +26,7 @@ results.save에 실패하면 본문만 출력하고 끝내지 말고 저장 실�
 2) ID가 다르거나 작업 상태가 pending이 아니면 작성하거나 저장하지 말고 알려준다.
 3) snapshot에 저장된 장르·분위기·시점·전개 속도·분량·등장인물·세계관·줄거리·회차 목표를 반영해 제목과 웹소설 본문을 완성한다.
 4) 작성이 끝나면 반드시 dject Action의 results.save를 호출해 위 작업 ID에 제목과 본문을 저장한다.
-5) results.save 성공 응답에서 response가 저장되고 상태가 ready 또는 conflict가 된 것을 확인한 뒤에만 완료라고 말한다.
+5) results.save 성공 응답에서 결과가 저장되고 상태가 ready 또는 conflict가 된 것을 확인한 뒤에만 완료라고 말한다.
 6) results.apply는 호출하지 않는다. 본문 반영은 내가 Dject에서 새 글을 확인한 뒤 선택한다.
 
 중요: 글만 채팅에 작성하고 results.save 없이 끝내면 안 된다. 저장 성공 후에는 긴 본문을 다시 출력하지 말고 "집필을 마쳤습니다. 디젝트에서 새 글을 확인하세요."라고 짧게 알려줘.`;
@@ -59,7 +59,27 @@ results.save에 실패하면 본문만 출력하고 끝내지 말고 저장 실�
     }catch{}
     return 'Dject Action을 넣은 Custom GPT의 https://chatgpt.com/g/... 주소만 사용할 수 있습니다.';
   };
+
+  function ensureConnectionUi(){
+    const input=el('gptUrl');
+    if(!input)return;
+    const label=document.querySelector('label[for="gptUrl"]');
+    if(label)label.textContent='Custom GPT 주소';
+    input.placeholder='https://chatgpt.com/g/g-...';
+    let hint=el('gptUrlHint');
+    if(!hint){
+      hint=document.createElement('p');hint.id='gptUrlHint';hint.className='muted';
+      const oldHint=input.nextElementSibling;
+      if(oldHint?.classList?.contains('muted'))oldHint.replaceWith(hint);else input.after(hint);
+    }
+    let test=el('testGptConnection');
+    const save=el('saveGptProfile');
+    if(!test&&save?.parentElement){test=document.createElement('button');test.type='button';test.id='testGptConnection';test.textContent='Action 연결 테스트';save.parentElement.append(test);}
+  }
+  ensureConnectionUi();
+
   const fillUrl=()=>{
+    ensureConnectionUi();
     const input=el('gptUrl');if(!input)return;
     input.value=readUrls()[activeId()]||'';
     const hint=el('gptUrlHint');
